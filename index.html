@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comically unDisciplined</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap');
+        .font-comic { font-family: 'Bangers', cursive; letter-spacing: 0.05em; }
+        .font-body { font-family: 'Open Sans', sans-serif; }
+        .comic-border { border: 4px solid black; box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); }
+        .panel-caption { background: white; border: 2px solid black; padding: 4px 8px; font-weight: bold; }
+        body { background-color: #f3f4f6; background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px; }
+        
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .typewriter-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid transparent;
+            animation: typewriter 2s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: currentColor; }
+        }
+
+        @keyframes comic-pulse {
+            0%, 100% { filter: brightness(100%) drop-shadow(0 0 0px #ff0000); }
+            50% { filter: brightness(125%) drop-shadow(0 0 12px #ef4444); }
+        }
+        
+        .animate-comic-glow {
+            animation: comic-pulse 1.5s ease-in-out infinite;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+  }
+}
+</script>
+</head>
+<body class="font-body">
+    <div id="root"></div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "name": "Comically unDisciplined",
+  "description": "Scrapes official Austin official complaint and disciplinary reports and transforms them into short, AI-generated urban superhero comic strips.",
+  "requestFramePermissions": []
+}
