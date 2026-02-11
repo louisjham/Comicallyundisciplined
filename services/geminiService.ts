@@ -1,17 +1,18 @@
 
-import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
-import { ComicStrip, ReportSummary } from "../types";
+import { GoogleGenAI, Type } from "@google/genai";
+import { ComicStrip, ReportSummary, AppMode } from "../types";
+import { AI_INSTRUCTIONS, STYLE_PROMPTS } from "../constants/content";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
-// Simplified style for faster generation and "rougher" comic look
-const ASSET_STYLE_PROMPT = "Rough ink indie urban comic sketch, bold minimalist lines, high contrast, limited color palette, gritty 2D aesthetic, dynamic urban composition.";
+const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 export const geminiService = {
   async fetchRandomReport(): Promise<ReportSummary> {
+    const ai = getAI();
+    const seed = Date.now().toString().slice(-6);
+    
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: "Search for a specific summary of a real disciplinary action or complaint document from the Austin Police Department (APD) at austintexas.gov. Focus on a clear, documented incident. Provide a structured summary including the incident date, officer name, the specific allegation or violation, and the final disciplinary outcome. Ensure the 'originalText' field contains a detailed chronological account of the incident. Also, provide the 'sourceUrl' which is the direct link to the official Austin city document or the page hosting it.",
+      contents: AI_INSTRUCTIONS.SEARCH_PROMPT(seed),
       config: {
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
@@ -22,8 +23,8 @@ export const geminiService = {
             officerName: { type: Type.STRING },
             allegation: { type: Type.STRING },
             outcome: { type: Type.STRING },
-            originalText: { type: Type.STRING, description: "Detailed chronological description of the incident events" },
-            sourceUrl: { type: Type.STRING, description: "The URL of the original source document" },
+            originalText: { type: Type.STRING },
+            sourceUrl: { type: Type.STRING },
           },
           required: ["incidentDate", "officerName", "allegation", "outcome", "originalText", "sourceUrl"]
         }
@@ -31,42 +32,37 @@ export const geminiService = {
     });
 
     try {
-      return JSON.parse(response.text.trim());
+      const data = JSON.parse(response.text.trim());
+      const groundingUrl = response.candidates?.[0]?.groundingMetadata?.groundingChunks?.find(c => c.web?.uri?.includes('.pdf'))?.web?.uri 
+                          || response.candidates?.[0]?.groundingMetadata?.groundingChunks?.[0]?.web?.uri;
+      
+      if ((!data.sourceUrl || data.sourceUrl.includes('google.com')) && groundingUrl) {
+        data.sourceUrl = groundingUrl;
+      }
+      return data;
     } catch (e) {
       console.error("Failed to parse report summary:", e);
-      throw new Error("Could not generate a valid report summary.");
+      throw new Error("Could not extract a valid incident report.");
     }
   },
 
-  async generateComicScript(report: ReportSummary): Promise<ComicStrip> {
-    const prompt = `
-      Create a 4-panel comic strip script based strictly on the following real-world police disciplinary report.
-      While the visual style should be '${ASSET_STYLE_PROMPT}', the narrative and events must remain faithful to the actual facts. 
-      
-      REPORT DATA:
-      Officer: ${report.officerName}
-      Date: ${report.incidentDate}
-      Allegation: ${report.allegation}
-      Outcome: ${report.outcome}
-      Details: ${report.originalText}
-
-      INSTRUCTIONS:
-      1. Use real-world terminology.
-      2. Depict the events chronologically across 4 panels.
-      3. The art style is simplified rough ink.
-      4. Ensure the 'speechBubble' reflects the core conflict.
-
-      Output JSON:
-      - 'title': A dynamic title (e.g., 'THE BROKEN OATH', 'PRECINCT SHADOWS').
-      - 'originalSummary': A 1-sentence factual summary.
-      - 'panels': Array of 4 panels with 'id', 'narration', 'visualPrompt', and 'speechBubble'.
-    `;
-
-    // Switched to gemini-3-flash-preview for faster processing than Pro
+  async generateComicScript(report: ReportSummary, mode: AppMode): Promise<ComicStrip> {
+    const ai = getAI();
+    
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: prompt,
+      contents: `
+        REPORT DATA:
+        Officer: ${report.officerName}
+        Allegation: ${report.allegation}
+        Incident: ${report.originalText}
+        Outcome: ${report.outcome}
+
+        INSTRUCTIONS:
+        Create a 4-panel strip based on the ${mode === 'gritty' ? 'Verbatim' : 'Superhero Parody'} style.
+      `,
       config: {
+        systemInstruction: AI_INSTRUCTIONS.SCRIPT_SYSTEM(mode),
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -96,27 +92,20 @@ export const geminiService = {
     return { ...parsed, sourceUrl: report.sourceUrl };
   },
 
-  async generatePanelImage(visualPrompt: string): Promise<string> {
-    // Stripped "Detailed uniforms, cinematic lighting" to favor faster, simpler output
-    const fullPrompt = `${visualPrompt} | Style: ${ASSET_STYLE_PROMPT}`;
+  async generatePanelImage(visualPrompt: string, mode: AppMode): Promise<string> {
+    const ai = getAI();
+    const fullPrompt = `${visualPrompt} | Style: ${STYLE_PROMPTS[mode]}`;
     
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: {
-        parts: [{ text: fullPrompt }]
-      },
-      config: {
-        imageConfig: {
-          aspectRatio: "1:1"
-        }
-      }
+      contents: { parts: [{ text: fullPrompt }] },
+      config: { imageConfig: { aspectRatio: "1:1" } }
     });
 
     const part = response.candidates?.[0]?.content?.parts.find(p => p.inlineData);
     if (part?.inlineData) {
       return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
     }
-    
     throw new Error("No image data returned from Gemini");
   }
 };

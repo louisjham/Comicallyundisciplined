@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
 
-const MESSAGES = [
-  "Accessing the Metro Justice Database...",
-  "Intercepting encrypted Guardian reports...",
-  "Calibrating neural-link visuals...",
-  "Analyzing incident coordinates...",
-  "Synthesizing high-def superhero renderings...",
-  "Updating the Discipline Files...",
-  "Applying comic-ink filters..."
-];
+import React, { useState, useEffect } from 'react';
+import { LOADING_MESSAGES } from '../constants/content';
 
 const LoadingState: React.FC = () => {
   const [msgIndex, setMsgIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMsgIndex((prev) => (prev + 1) % MESSAGES.length);
-    }, 4000); // 4 seconds interval to allow typewriter effect to finish
+      setMsgIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -25,15 +17,14 @@ const LoadingState: React.FC = () => {
       <div className="relative">
         <div className="w-24 h-24 border-8 border-black border-t-red-600 rounded-full animate-spin"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl animate-pulse">⚡</span>
+          <span className="text-3xl">⚖️</span>
         </div>
       </div>
       <div className="text-center space-y-2 min-h-[100px] flex flex-col justify-center items-center">
-        <h2 className="text-3xl font-comic uppercase text-black italic">Activating Justice Protocols</h2>
-        {/* Re-mount component on index change to restart typewriter animation */}
+        <h2 className="text-2xl font-comic uppercase text-black tracking-widest">Archive Investigation in Progress</h2>
         <div key={msgIndex} className="inline-block overflow-hidden max-w-full">
-          <p className="text-lg font-bold text-gray-600 typewriter-text border-none">
-            {MESSAGES[msgIndex]}
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-tight">
+            {LOADING_MESSAGES[msgIndex]}
           </p>
         </div>
       </div>

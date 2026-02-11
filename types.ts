@@ -1,4 +1,6 @@
 
+export type AppMode = 'gritty' | 'superhero';
+
 export interface ComicPanel {
   id: number;
   narration: string;
@@ -12,6 +14,7 @@ export interface ComicStrip {
   originalSummary: string;
   panels: ComicPanel[];
   sourceUrl?: string;
+  timestamp?: number; // Added for storage sorting
 }
 
 export interface ReportSummary {

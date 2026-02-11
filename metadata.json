@@ -1,5 +1,5 @@
 {
-  "name": "Comically unDisciplined",
-  "description": "Scrapes official Austin official complaint and disciplinary reports and transforms them into short, AI-generated urban superhero comic strips.",
+  "name": "Real Life Tales from the APD Complaint Reports",
+  "description": "A documentary-style visualization tool that presents verbatim incident summaries from official Austin Police Department disciplinary archives as graphic novel strips.",
   "requestFramePermissions": []
 }
