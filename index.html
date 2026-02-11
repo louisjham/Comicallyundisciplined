@@ -40,6 +40,20 @@
         .animate-comic-glow {
             animation: comic-pulse 1.5s ease-in-out infinite;
         }
+
+        /* Swipe Transition */
+        @keyframes swipeIn {
+            0% { transform: translateX(50px) rotate(1deg); opacity: 0; }
+            100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+        }
+
+        .animate-swipe {
+            animation: swipeIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; border-radius: 0; }
     </style>
 <script type="importmap">
 {

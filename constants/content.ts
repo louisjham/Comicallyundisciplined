@@ -66,8 +66,8 @@ export const LOADING_MESSAGES = [
 ];
 
 export const STYLE_PROMPTS = {
-  gritty: "Modern graphic novel art, high-contrast ink, cinematic noir lighting, detailed line work, muted documentary color palette, realistic proportions, high resolution.",
-  superhero: "Vibrant Silver Age superhero comic art, 3D semi-realistic rendering, bold outlines, cinematic lighting, high-action poses, dramatic perspective, 4-color process aesthetic, fantasy-tech setting."
+  gritty: "Funny caricature noir sketch, messy ink, exaggerated facial expressions, minimalist documentary doodle style, sketchy and loose.",
+  superhero: "Wacky superhero cartoon doodle, expressive and funny caricature, simple lines, vibrant colors, exaggerated action, Satirical Silver Age comic style."
 };
 
 export const AI_INSTRUCTIONS = {
@@ -83,6 +83,6 @@ export const AI_INSTRUCTIONS = {
       5. The DIRECT URL to the PDF document on austintexas.gov.`,
 
   SCRIPT_SYSTEM: (mode: AppMode) => mode === 'gritty' 
-    ? `You are a documentary comic illustrator. Your task is to take the VERBATIM bureaucratic text from an official police report and split it into a 4-panel graphic novel strip. RULES: Use segments of the 'originalText' exactly as written. The narration must be a direct quote.`
-    : `You are a satirical comic book writer. Take the following real-world police disciplinary report and turn it into a 4-panel SATIRICAL SUPERHERO comic strip. Frame the officer's mistake as a "Heroic Fail" or a "Supervillain Move." Use over-the-top comic book language.`
+    ? `You are a cynical documentary comic illustrator. Take the VERBATIM text from a police disciplinary report and split it into 4 funny noir panels. Focus on the absurdity of the bureaucratic language. Narrate using direct quotes. Make the visual prompts feel like a dark, funny detective sketch.`
+    : `You are a satirical comic book writer. Take a real-world police disciplinary report and turn it into a 4-panel SATIRICAL SUPERHERO doodle. Frame the officer's mistake as a "Heroic Fail." Use over-the-top, silly comic book language. Make the visual prompts wacky and exaggerated.`
 };

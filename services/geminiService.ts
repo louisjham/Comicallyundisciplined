@@ -8,11 +8,11 @@ const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 export const geminiService = {
   async fetchRandomReport(): Promise<ReportSummary> {
     const ai = getAI();
-    const seed = Date.now().toString().slice(-6);
+    const seed = Date.now().toString().slice(-4);
     
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: AI_INSTRUCTIONS.SEARCH_PROMPT(seed),
+      contents: `Find a RECENT Austin Police Department Disciplinary PDF (Notice of Formal Suspension). Search target: "site:austintexas.gov disciplinary suspension ${seed}".`,
       config: {
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
@@ -52,14 +52,9 @@ export const geminiService = {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `
-        REPORT DATA:
-        Officer: ${report.officerName}
-        Allegation: ${report.allegation}
-        Incident: ${report.originalText}
-        Outcome: ${report.outcome}
-
-        INSTRUCTIONS:
-        Create a 4-panel strip based on the ${mode === 'gritty' ? 'Verbatim' : 'Superhero Parody'} style.
+        OFFICER: ${report.officerName}
+        ALLEGATION: ${report.allegation}
+        INCIDENT: ${report.originalText}
       `,
       config: {
         systemInstruction: AI_INSTRUCTIONS.SCRIPT_SYSTEM(mode),
@@ -94,7 +89,9 @@ export const geminiService = {
 
   async generatePanelImage(visualPrompt: string, mode: AppMode): Promise<string> {
     const ai = getAI();
-    const fullPrompt = `${visualPrompt} | Style: ${STYLE_PROMPTS[mode]}`;
+    // Simplified prompt for faster 'sketchy' style generation
+    const style = STYLE_PROMPTS[mode];
+    const fullPrompt = `${style}: ${visualPrompt}`;
     
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
