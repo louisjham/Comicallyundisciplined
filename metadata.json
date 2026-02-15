@@ -1,5 +1,5 @@
 {
-  "name": "Real Life Tales from the APD Complaint Reports",
-  "description": "A documentary-style visualization tool that presents verbatim incident summaries from official Austin Police Department disciplinary archives as graphic novel strips.",
+  "name": "Austin Police Department Complaints : The Graphic Novel",
+  "description": "An artistic exploration of the complaints submitted by Austin residents against APD officers. ",
   "requestFramePermissions": []
 }
