@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [currentLoadingPhase, setCurrentLoadingPhase] = useState<LoadingPhase>('INITIAL');
 
   const [mode, setMode] = useState<AppMode>('gritty');
+  const [fastMode, setFastMode] = useState<boolean>(false);
   const [error, setError] = useState<{ message: string; isQuota?: boolean; isBusy?: boolean } | null>(null);
   
   const [archive, setArchive] = useState<ComicStrip[]>([]);
@@ -65,6 +66,8 @@ const App: React.FC = () => {
     setCurrentLoadingPhase('INITIAL');
   }
 
+  const [isScraping, setIsScraping] = useState<boolean>(false);
+
   // Function to handle loading the next random report
   const handleGenerateRandomReport = useCallback(() => {
     clearCurrentComic(); // Clear any existing comic
@@ -73,6 +76,23 @@ const App: React.FC = () => {
     setSelectedReport(nextReport);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [allHardcodedReports, getRandomUnseenReport]);
+
+  const handleScrapeLiveReport = useCallback(async () => {
+    clearCurrentComic();
+    setIsScraping(true);
+    setCurrentLoadingPhase('INITIAL');
+    try {
+      const liveReport = await geminiService.fetchScrapedReport();
+      setAllHardcodedReports(prev => [liveReport, ...prev]);
+      setSelectedReport(liveReport);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err: any) {
+      console.error(err);
+      setError({ message: err.message || "Failed to scrape live report." });
+    } finally {
+      setIsScraping(false);
+    }
+  }, []);
 
   // New function to start the investigation from the landing page
   const handleStartInvestigation = useCallback(() => {
@@ -123,9 +143,15 @@ const App: React.FC = () => {
       
       const updatedPanels = [...initialComic.panels];
       
-      const panelPromises = script.panels.map(async (panel, idx) => {
+      for (let idx = 0; idx < script.panels.length; idx++) {
+        const panel = script.panels[idx];
         try {
-          const imageUrl = await geminiService.generatePanelImage(panel.visualPrompt, mode);
+          // Add a longer delay between requests to respect rate limits unless fast mode
+          if (!fastMode) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+          
+          const imageUrl = await geminiService.generatePanelImage(panel.visualPrompt, mode, fastMode);
           
           setComic(current => {
             if (!current || current.timestamp !== initialTimestamp) return current;
@@ -138,9 +164,7 @@ const App: React.FC = () => {
         } catch (imgErr) {
           console.error(`Failed image for panel ${idx}:`, imgErr);
         }
-      });
-
-      await Promise.all(panelPromises);
+      }
       
       const finalComic: ComicStrip = {
         ...initialComic,
@@ -184,7 +208,7 @@ const App: React.FC = () => {
   };
 
   // Determine global loading state for disabling buttons
-  const isLoadingAny = isGeneratingComic || (hasInvestigationStarted && !selectedReport && allHardcodedReports.length > 0);
+  const isLoadingAny = isGeneratingComic || isScraping || (hasInvestigationStarted && !selectedReport && allHardcodedReports.length > 0);
 
   return (
     <div className={`min-h-screen pb-12 transition-colors duration-500 ${mode === 'superhero' ? 'bg-yellow-50' : 'bg-gray-100'}`}>
@@ -201,6 +225,12 @@ const App: React.FC = () => {
             <div className="flex bg-gray-800 p-1 comic-border border-white border-2">
               <button onClick={() => setMode('gritty')} className={`px-4 py-1 text-xs font-bold uppercase ${mode === 'gritty' ? 'bg-white text-black' : 'text-gray-400'}`}>Gritty Noir</button>
               <button onClick={() => setMode('superhero')} className={`px-4 py-1 text-xs font-bold uppercase ${mode === 'superhero' ? 'bg-red-600 text-white' : 'text-gray-400'}`}>Heroic Fail</button>
+            </div>
+            
+            <div className="flex bg-gray-800 p-1 comic-border border-white border-2">
+              <button onClick={() => setFastMode(!fastMode)} className={`px-4 py-1 text-xs font-bold uppercase ${fastMode ? 'bg-green-500 text-white' : 'text-gray-400'}`}>
+                {fastMode ? '⚡ Fast Mode ON' : 'Fast Mode OFF'}
+              </button>
             </div>
 
             <button onClick={() => setIsLockerOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-2 border-white hover:bg-gray-800 relative group" disabled={isLoadingAny}>
@@ -246,7 +276,9 @@ const App: React.FC = () => {
                 selectedReport={selectedReport}
                 onGenerateRandomReport={handleGenerateRandomReport}
                 onGenerateComicFromReport={generateComicStrip}
+                onScrapeLiveReport={handleScrapeLiveReport}
                 isGeneratingComic={isGeneratingComic}
+                isScraping={isScraping}
                 error={error}
                 currentLoadingPhase={currentLoadingPhase}
               />

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { LOADING_MESSAGES } from '../constants/content';
 
-export type LoadingPhase = 'INITIAL' | 'COMIC_GENERATION'; // Updated type
+export type LoadingPhase = 'INITIAL' | 'COMIC_GENERATION' | 'REPORT_DETAIL_FETCH'; // Updated type
 
 interface LoadingStateProps {
   phase: LoadingPhase;
@@ -21,6 +21,15 @@ const LoadingState: React.FC<LoadingStateProps> = ({ phase }) => {
     return () => clearInterval(interval);
   }, [phase, currentMessages.length]);
 
+  const getPhaseTitle = () => {
+    switch (phase) {
+      case 'COMIC_GENERATION': return "Generating Comic Strip...";
+      case 'REPORT_DETAIL_FETCH': return "Fetching Report Details...";
+      case 'INITIAL':
+      default: return "Loading Application...";
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center p-12 space-y-8 bg-white comic-border max-w-2xl mx-auto my-12">
       <div className="relative">
@@ -31,8 +40,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({ phase }) => {
       </div>
       <div className="text-center space-y-2 min-h-[100px] flex flex-col justify-center items-center">
         <h2 className="text-2xl font-comic uppercase text-black tracking-widest">
-          {phase === 'COMIC_GENERATION' && "Generating Comic Strip..."}
-          {phase === 'INITIAL' && "Loading Application..."}
+          {getPhaseTitle()}
         </h2>
         <div key={msgIndex} className="inline-block overflow-hidden max-w-full">
           <p className="text-sm font-bold text-gray-500 uppercase tracking-tight">

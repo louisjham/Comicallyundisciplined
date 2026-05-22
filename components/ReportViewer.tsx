@@ -8,7 +8,9 @@ interface ReportViewerProps {
   selectedReport: ReportSummary | null;
   onGenerateRandomReport: () => void;
   onGenerateComicFromReport: (report: ReportSummary) => Promise<void>;
+  onScrapeLiveReport: () => void;
   isGeneratingComic: boolean;
+  isScraping: boolean;
   error: { message: string; isQuota?: boolean; isBusy?: boolean } | null;
   currentLoadingPhase: LoadingPhase | null;
 }
@@ -18,12 +20,14 @@ const ReportViewer: React.FC<ReportViewerProps> = ({
   selectedReport,
   onGenerateRandomReport,
   onGenerateComicFromReport,
+  onScrapeLiveReport,
   isGeneratingComic,
+  isScraping,
   error,
   currentLoadingPhase
 }) => {
   const isGritty = mode === 'gritty';
-  const isLoadingAny = isGeneratingComic; // Only comic generation is a loading state now
+  const isLoadingAny = isGeneratingComic || isScraping; // Added isScraping
 
   if (!selectedReport) {
     // This state should ideally not be reached if initial report is loaded on app start
@@ -82,13 +86,22 @@ const ReportViewer: React.FC<ReportViewerProps> = ({
           >
             {isGeneratingComic ? 'Generating Comic...' : UI_TEXT.SELECTED_REPORT_VIEW.GENERATE_COMIC_BUTTON}
           </button>
-          <button
-            onClick={onGenerateRandomReport}
-            disabled={isLoadingAny}
-            className={`px-4 py-2 font-comic text-sm uppercase ${isGritty ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-400 hover:bg-gray-300'} text-white comic-border border-white w-full md:w-auto`}
-          >
-            {UI_TEXT.BUTTONS.NEXT_CASE}
-          </button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <button
+              onClick={onScrapeLiveReport}
+              disabled={isLoadingAny}
+              className={`px-4 py-2 font-comic text-sm uppercase ${isGritty ? 'bg-indigo-700 hover:bg-indigo-600' : 'bg-purple-600 hover:bg-purple-500'} text-white comic-border border-white w-full md:w-auto`}
+            >
+              {isScraping ? 'Scraping...' : 'Live Scrape New Case (Web)'}
+            </button>
+            <button
+              onClick={onGenerateRandomReport}
+              disabled={isLoadingAny}
+              className={`px-4 py-2 font-comic text-sm uppercase ${isGritty ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-400 hover:bg-gray-300'} text-white comic-border border-white w-full md:w-auto`}
+            >
+              {UI_TEXT.BUTTONS.NEXT_CASE}
+            </button>
+          </div>
         </div>
       </div>
     </div>

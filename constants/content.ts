@@ -12,9 +12,9 @@ export const UI_TEXT = {
     ABOUT_REPORTS_CONTENT_P1: "This application offers an artistic exploration of complaints submitted by Austin residents against APD officers. It utilizes public access disciplinary reports, detailing incidents involving its police department. These documents are part of a commitment to transparency and accountability, offering insights into citizen interactions and internal investigations.",
     ABOUT_REPORTS_CONTENT_P2: "These reports are collected by the Austin Police Department's Office of Police Oversight. They cover a range of allegations, from improper police procedure and discourtesy to delayed responses and more serious misconduct, providing a public record of interactions between officers and the community.",
     ABOUT_REPORTS_CONTENT_P3: "This site uses an archive of these real reports to create a unique narrative experience.",
-    HOW_IT_WORKS_HEADER: "Your Mission, Should You Choose to Accept It...",
-    HOW_IT_WORKS_CONTENT_P1: "Each time you 'Start Investigation' or 'Examine Next Case', our advanced AI systems pull one random disciplinary report from a curated archive of 75 unique cases. It then analyzes the report to extract the core incident, officer names, and outcomes. Using these details, it crafts a short, engaging comic strip.",
-    HOW_IT_WORKS_CONTENT_P2: "You can view these narratives in two distinct styles: 'Gritty Noir' for a serious, documentary-like take, or 'Heroic Fail' for a more satirical, exaggerated comic book feel. It's all in good fun, a way to visualize bureaucracy through a unique lens.",
+    HOW_IT_WORKS_HEADER: "Deconstructing the Archive",
+    HOW_IT_WORKS_CONTENT_P1: "Every time you engage the system—initiating an investigation or probing the next case—an algorithmic excavation begins. We isolate a single, raw disciplinary report from a curated archive of 75 distinct fractures in protocol. The system strips away the bureaucratic noise to expose the core transgression, the actors involved, and the institutional response, transmuting these sterile facts into a visceral graphic narrative.",
+    HOW_IT_WORKS_CONTENT_P2: "You dictate the lens through which this reality is refracted. Choose 'Gritty Noir' for an uncompromising, documentary exposure of systemic gravity, or command the 'Heroic Fail' module to weaponize satire against institutional absurdity. This is a boundary-pushing endeavor to force transparency through art, dragging public records out of the filing cabinet and onto the canvas.",
     DISCLAIMER_HEADER: "Important Disclaimer:",
     DISCLAIMER_CONTENT_P1: "This application is an experimental visualization tool. The generated comic strips are AI interpretations of public records and are for entertainment and educational purposes only. While based on real reports, they are not factual depictions and should not be taken as literal accounts. Always refer to the original source documents for accurate information.",
     DISCLAIMER_CONTENT_P2: "These specific complaints do not reflect on the Austin Police Department as a whole, nor is this site an attempt to lower the general respect for police officers. It is an exploration of individual incidents and part of a broader public accountability process.",
@@ -100,7 +100,7 @@ export const UI_TEXT = {
 
   // Buttons & Labels
   BUTTONS: {
-    START_INVESTIGATION: "Start Investigation", // New button text for landing page
+    START_INVESTIGATION: "Get a new complaint and transform", // New button text for landing page
     NEXT_CASE: "Examine Next Case", 
     NEW_CASE: "Access New Case", 
     LOADING: "Accessing Archives...",
@@ -134,15 +134,21 @@ export const LOADING_MESSAGES = {
     "Generating visual assets for each panel...",
     "Inking final comic strip details...",
   ],
+  REPORT_DETAIL_FETCH: [
+    "Accessing public records database...",
+    "Retrieving case file details...",
+    "Parsing incident summary...",
+    "Finalizing report data...",
+  ],
 };
 
 export const STYLE_PROMPTS = {
-  gritty: "Simple, classic noir artwork, high contrast, black and white, dramatic shadows, serious tone, realistic proportions, clean ink lines, detailed environments, no humor.",
-  superhero: "Wacky superhero cartoon doodle, expressive and funny caricature, simple lines, vibrant colors, exaggerated action, Satirical Silver Age comic style."
+  gritty: "Simple noir artwork, high contrast, black and white, dramatic shadows, serious tone, clean lines, detailed environments.",
+  superhero: "Simple superhero cartoon doodle, expressive, vibrant colors, exaggerated action, Satirical Silver Age comic style."
 };
 
 export const AI_INSTRUCTIONS = {
   SCRIPT_SYSTEM: (mode: AppMode) => mode === 'gritty' 
-    ? `You are a documentary comic illustrator. Your task is to interpret a police disciplinary report and split it into a comic strip of 2 to 8 distinct panels. The narration for each panel should be derived from the report text, but can be phrased more creatively to fit a noir narrative. Generate compelling visual prompts for a simple, classic noir artwork, high contrast, black and white, dramatic shadows, serious tone, realistic proportions, clean ink lines, and detailed environments. Ensure no humor or absurdity is injected.`
-    : `You are a satirical comic book writer. Take a real-world police disciplinary report and turn it into a 2 to 8-panel SATIRICAL SUPERHERO doodle. Frame the officer's actions or mistakes as "Heroic Fails" or exaggerated blunders. Use over-the-top, silly comic book language in the narration and speech bubbles. Make the visual prompts wacky and exaggerated, in a style of a Silver Age comic.`
+    ? `You are a documentary comic illustrator. Your task is to interpret a police disciplinary report and split it into a comic strip of 2 to 6 panels. The narration for each panel MUST be strictly derived from the report text. Do not hallucinate details. Generate compelling visual prompts for a simple, classic noir artwork, high contrast, black and white, dramatic shadows, serious tone, realistic proportions, clean ink lines, and detailed environments. Ensure no humor or absurdity is injected.`
+    : `You are a satirical comic book writer. Take a real-world police disciplinary report and turn it into a 2 to 6-panel SATIRICAL SUPERHERO doodle. Frame the officer's actions or mistakes as "Heroic Fails" or exaggerated blunders. The narration and speech bubbles MUST be strictly derived from the report text. Use over-the-top, silly comic book language. Make the visual prompts wacky and exaggerated, in a style of a Silver Age comic.`
 };
