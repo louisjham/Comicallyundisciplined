@@ -3,16 +3,15 @@ import { createServer as createViteServer } from "vite";
 import * as path from "path";
 import * as url from "url";
 import * as cheerio from "cheerio";
-import { createRequire } from "module";
 import { GoogleGenAI, Type } from "@google/genai";
-
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
+  const mod = await import("pdf-parse");
+  const pdf = mod.default || mod;
+
   const app = express();
   const PORT = 3000;
 
@@ -119,7 +118,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('/:any*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
